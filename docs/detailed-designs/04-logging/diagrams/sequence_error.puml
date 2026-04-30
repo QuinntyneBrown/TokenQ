@@ -10,28 +10,34 @@ participant "FileWriter" as FW
 participant "ILogger" as L
 participant "stderr" as Err
 
-== Invalid name (validation failure -> exit 1) ==
+== Invalid name (validation failure) ==
 
 H -> G : Render("1Foo")
-G --> H : throw InvalidNameException("Name must start with a letter, '_' or '$'")
+G --> H : throw InvalidNameException(message)
 
-H -> L : Error "Name must start with a letter, '_' or '$'"
-L -> Err : "fail: Name must start with a letter, '_' or '$'"
+H -> L : LogError(message)
+L -> Err : "fail: <message>"
 note right of L
-  exactly one Error message
-  -> exit 1
+  exactly one Error log
+  per failure
+  exit code = 1
 end note
 
-== Unhandled exception (-> exit 2) ==
+== Unhandled exception ==
 
 H -> FW : Write(...)
 FW --> H : throw NullReferenceException(...)
 
-H -> L : Error "Unexpected internal error"
+H -> L : LogError("Unexpected internal error")
 L -> Err : "fail: Unexpected internal error"
 
-alt --verbose
-    H -> Err : ex.ToString()  (raw stack trace, NOT via ILogger)
+alt verbose flag set
+    H -> Err : ex.ToString() written directly
+    note right
+      raw stack trace bypasses ILogger
+      so it never appears in the
+      normal log stream
+    end note
 end
 
 H --> H : return 2
