@@ -1,0 +1,58 @@
+@startuml class_diagram
+!theme plain
+skinparam classAttributeIconSize 0
+skinparam classFontSize 12
+
+title Name Derivation - Updated Generator
+
+class Generator {
+    -FileTypes: string[] = ["Store","Service"]
+    +Render(name: string): GeneratedFile
+    -ToPascalCase(name: string): string
+    -StripLeadingI(pascal: string): string
+    -DetectFileType(words: string[]): (string[], string?)
+    -ToKebabCase(words: string[]): string
+    -ToScreamingSnakeCase(words: string[]): string
+    {static} ~SplitWords(pascal: string): string[]
+}
+
+class "NameValidator <<static>>" as NameValidator {
+    +Validate(name: string?): ValidationResult
+    .. rules ..
+    - non-empty, length <= 200
+    - first char [A-Za-z]
+    - chars in [A-Za-z0-9-]
+    - no leading/trailing/double '-'
+    - normalised form not reserved
+    - normalised form not a bare file type
+}
+
+class GeneratedFile <<record>> {
+    +Filename: string
+    +Content: string
+}
+
+abstract class ValidationResult <<record>>
+class "ValidationResult.Ok" as VOk <<record>>
+class "ValidationResult.Failed" as VFail <<record>> {
+    +Message: string
+}
+
+class InvalidNameException <<exception>> {
+    +Message: string
+}
+
+Generator ..> NameValidator : calls
+Generator ..> GeneratedFile : returns
+Generator ..> InvalidNameException : throws on invalid name
+NameValidator ..> ValidationResult : returns
+ValidationResult <|-- VOk
+ValidationResult <|-- VFail
+
+note right of Generator
+  All transformations are
+  private static helpers.
+  No new public types.
+end note
+
+@enduml

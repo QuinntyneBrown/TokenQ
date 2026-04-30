@@ -24,18 +24,24 @@ filesystem and the standard streams (stdout/stderr).
 
 ## Vertical Slice Map
 
-The five slices below are ordered for ATDD. Each is independently testable and
+The slices below are ordered for ATDD. Each is independently testable and
 each ends in something the user can observe. A later slice depends on the
 classes introduced by an earlier slice but does not require any earlier slice
 to be feature-complete in order to begin.
 
 | #  | Feature | Status | What the user can observe after this slice | L2 IDs |
 |----|---------|--------|---------------------------------------------|--------|
-| 01 | [Generator Core](01-generator-core/README.md) | Complete | Calling `Generator.Render("IFooService")` returns the exact bytes that will be written to `foo-service.ts`. | L2-001, L2-002, L2-005, L2-007, L2-009, L2-015 |
+| 01 | [Generator Core](01-generator-core/README.md) | Superseded by 06 | Calling `Generator.Render("IFooService")` returns the exact bytes that will be written to `foo-service.ts`. | L2-001, L2-002, L2-005, L2-007, L2-009, L2-015 |
 | 02 | [CLI Shell](02-cli-shell/README.md) | Accepted | `tokenq --name IFooService` parses arguments, calls the generator, prints content to stdout, and exits with the right code. | L2-003, L2-004 (option binding), L2-011, L2-016 |
 | 03 | [File Output](03-file-output/README.md) | Draft | `tokenq --name IFooService --output ./svc` writes the file to disk safely with overwrite control. | L2-004 (write), L2-006, L2-008 |
 | 04 | [Logging](04-logging/README.md) | Draft | Success and failure paths emit the right log levels to the right streams; `--verbose` reveals debug detail. | L2-010, L2-011 (verbose stack trace) |
 | 05 | [Distribution](05-distribution/README.md) | Draft | `dotnet pack` produces a NuGet `.nupkg` that installs as a global tool and starts within the performance budget. | L2-012, L2-013, L2-014 |
+| 06 | [Name Derivation](06-name-derivation/README.md) | Draft | `Generator.Render("EventStore")` yields `event.store.contract.ts` with `IEventStore` + `EVENT_STORE`; `commandService` and `data-mode-controller` work likewise. | L2-001, L2-002, L2-005, L2-007, L2-015, L2-017, L2-018 |
+
+Slice 06 refines slice 01: it changes how the generator turns a user-supplied
+name into an interface name, token, and filename. Tests written against the
+slice-01 contract (`foo-service.ts`, no auto-`I` prefix) will be replaced when
+slice 06 lands.
 
 ## Whole-Tool Code Map
 

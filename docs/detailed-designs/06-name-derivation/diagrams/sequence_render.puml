@@ -1,0 +1,53 @@
+@startuml sequence_render
+!theme plain
+skinparam sequenceMessageAlign center
+
+title Generator.Render - PascalCase, File-Type, Filename Derivation
+
+participant "Caller\n(CLI shell or test)" as C
+participant "Generator" as G
+participant "NameValidator\n<<static>>" as V
+
+C -> G : Render("commandService")
+G -> V : Validate("commandService")
+V --> G : Ok
+
+note over G
+  ToPascalCase   -> "CommandService"
+  StripLeadingI  -> "CommandService"
+  SplitWords     -> ["Command","Service"]
+  DetectFileType -> base=["Command"], type="Service"
+  interface      -> "ICommandService"
+  token          -> "COMMAND_SERVICE"
+  filename       -> "command.service.contract.ts"
+  fill template, normalise to LF
+end note
+
+G --> C : GeneratedFile {\n  Filename = "command.service.contract.ts",\n  Content  = "...\\n"\n}
+
+== Kebab input, no recognised type ==
+
+C -> G : Render("data-mode-controller")
+G -> V : Validate("data-mode-controller")
+V --> G : Ok
+
+note over G
+  ToPascalCase   -> "DataModeController"
+  StripLeadingI  -> "DataModeController"
+  SplitWords     -> ["Data","Mode","Controller"]
+  DetectFileType -> base unchanged, type=null
+  interface      -> "IDataModeController"
+  token          -> "DATA_MODE_CONTROLLER"
+  filename       -> "data-mode-controller.contract.ts"
+end note
+
+G --> C : GeneratedFile { ... }
+
+== Validation failure ==
+
+C -> G : Render("Store")
+G -> V : Validate("Store")
+V --> G : Failed("name must include a base portion before the file-type suffix")
+G --> C : throw InvalidNameException(message)
+
+@enduml
