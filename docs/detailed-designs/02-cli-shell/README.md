@@ -1,6 +1,6 @@
 # 02 - CLI Shell — Detailed Design
 
-**Status:** Accepted
+**Status:** Complete
 
 ## 1. Overview
 
