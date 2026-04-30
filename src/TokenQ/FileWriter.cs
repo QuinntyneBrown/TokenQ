@@ -29,6 +29,8 @@ public sealed class FileWriter(ILogger<FileWriter>? logger = null)
         if (!fileAbsolute.StartsWith(dirWithSep, cmp))
             throw new OutputPathOutsideDirectoryException(fileAbsolute);
 
+        _logger.LogDebug("Resolved directory={Dir} file={File}", dirAbsolute, fileAbsolute);
+
         var preExisting = System.IO.File.Exists(fileAbsolute);
         if (preExisting && !force)
             throw new FileAlreadyExistsException(fileAbsolute);
@@ -38,6 +40,7 @@ public sealed class FileWriter(ILogger<FileWriter>? logger = null)
 
         Directory.CreateDirectory(dirAbsolute);
         System.IO.File.WriteAllBytes(fileAbsolute, Encoding.UTF8.GetBytes(file.Content));
+        _logger.LogDebug("Write force={Force} preExisting={Existed}", force, preExisting);
         return fileAbsolute;
     }
 }

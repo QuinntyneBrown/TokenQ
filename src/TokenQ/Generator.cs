@@ -30,6 +30,10 @@ public sealed class Generator(ILogger<Generator>? logger = null)
         var stem = string.Join('-', words).ToLowerInvariant();
         var token = string.Join('_', words).ToUpperInvariant();
 
+        _logger.LogDebug(
+            "Rendering interface={Interface} bare={Bare} kebab={Kebab} screaming={Screaming}",
+            interfaceName, bare, stem, token);
+
         var content = Template
             .Replace("{INTERFACE}", interfaceName)
             .Replace("{TOKEN}", token);

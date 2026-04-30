@@ -129,9 +129,9 @@ TokenQ applies a few conservative filesystem rules:
 ## Project Status
 
 TokenQ is pre-1.0. The implemented tool covers the current generator, CLI, file
-writer, validation, and test suite. The requirements and detailed designs also
-document planned work, including richer name derivation, logging, and release
-automation.
+writer, validation, console logging, and test suite. The requirements and
+detailed designs also document planned work, including richer name derivation
+and release automation.
 
 ## Documentation
 

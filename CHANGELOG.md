@@ -26,5 +26,6 @@ semantic versioning once published packages begin.
 - Optional `--output`, `--force`, and `--verbose` flags.
 - Safe file writer with directory creation and overwrite protection.
 - TypeScript identifier validation.
+- Console logging through `Microsoft.Extensions.Logging`.
 - xUnit test suite covering generator, CLI, validator, and file writer behavior.
 - Requirements and detailed design documentation under `docs/`.

@@ -15,7 +15,7 @@ detailed design documents.
 
 - Implement richer name normalization from `docs/detailed-designs/06-name-derivation/README.md`.
 - Align generated filenames with the `.contract.ts` design where required.
-- Add structured logging through `Microsoft.Extensions.Logging`.
+- Expand structured logging coverage where it helps troubleshooting.
 - Add packaging verification tests for NuGet tool output.
 - Add release automation for test, pack, and publish workflows.
 
