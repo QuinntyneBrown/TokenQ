@@ -5,3 +5,5 @@ obj/
 *.suo
 TestResults/
 .claude/scheduled_tasks.lock
+.artifacts/
+nupkg/

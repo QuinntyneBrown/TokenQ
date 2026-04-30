@@ -7,15 +7,34 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <RootNamespace>TokenQ</RootNamespace>
     <AssemblyName>TokenQ</AssemblyName>
+    <PackAsTool>true</PackAsTool>
+    <ToolCommandName>tokenq</ToolCommandName>
+    <PackageId>TokenQ</PackageId>
+    <Version>0.1.0</Version>
+    <Authors>Quinntyne Brown</Authors>
+    <Company>TokenQ contributors</Company>
+    <Product>TokenQ</Product>
+    <Description>Generate TypeScript interfaces and Angular InjectionToken constants from the command line.</Description>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <PackageProjectUrl>https://github.com/QuinntyneBrown/TokenQ</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/QuinntyneBrown/TokenQ</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+    <PackageTags>angular;typescript;injection-token;codegen;dotnet-tool</PackageTags>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
   </PropertyGroup>
 
   <ItemGroup>
     <PackageReference Include="System.CommandLine" Version="2.0.0-beta4.22272.1" />
     <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="8.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Logging.Console" Version="8.0.0" />
   </ItemGroup>
 
   <ItemGroup>
     <InternalsVisibleTo Include="TokenQ.Tests" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="..\..\README.md" Pack="true" PackagePath="\" />
   </ItemGroup>
 
 </Project>

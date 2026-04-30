@@ -1,9 +1,13 @@
 using System.Text;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging.Abstractions;
 
 namespace TokenQ;
 
-public sealed class FileWriter
+public sealed class FileWriter(ILogger<FileWriter>? logger = null)
 {
+    private readonly ILogger _logger = logger ?? NullLogger<FileWriter>.Instance;
+
     public string Write(string? outputDirectory, GeneratedFile file, bool force)
     {
         string dirAbsolute, fileAbsolute;
@@ -25,7 +29,8 @@ public sealed class FileWriter
         if (!fileAbsolute.StartsWith(dirWithSep, cmp))
             throw new OutputPathOutsideDirectoryException(fileAbsolute);
 
-        if (System.IO.File.Exists(fileAbsolute) && !force)
+        var preExisting = System.IO.File.Exists(fileAbsolute);
+        if (preExisting && !force)
             throw new FileAlreadyExistsException(fileAbsolute);
 
         if (System.IO.File.Exists(dirAbsolute) && !Directory.Exists(dirAbsolute))

@@ -64,6 +64,7 @@ public class GeneratorTests
     public void Generator_CanBeResolvedFromServiceProvider()
     {
         var services = new ServiceCollection();
+        services.AddLogging();
         services.AddTransient<Generator>();
         using var provider = services.BuildServiceProvider();
 

@@ -1,4 +1,6 @@
 using System.Text.RegularExpressions;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging.Abstractions;
 
 namespace TokenQ;
 
@@ -6,8 +8,10 @@ public sealed record GeneratedFile(string Filename, string Content);
 
 public sealed class InvalidNameException(string message) : Exception(message);
 
-public sealed class Generator
+public sealed class Generator(ILogger<Generator>? logger = null)
 {
+    private readonly ILogger _logger = logger ?? NullLogger<Generator>.Instance;
+
     private const string Template =
         "import { InjectionToken } from '@angular/core';\n" +
         "\n" +
