@@ -1,5 +1,7 @@
 # 02 - CLI Shell — Detailed Design
 
+**Status:** Accepted
+
 ## 1. Overview
 
 This slice turns the pure generator from slice 01 into something a developer
