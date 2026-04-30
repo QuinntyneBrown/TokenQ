@@ -32,7 +32,7 @@ public class ProgramTests : IDisposable
         var (_, _, exitCode) = RunMain("--name", "IFooService", "--output", dir);
 
         Assert.Equal(0, exitCode);
-        var content = File.ReadAllText(Path.Combine(dir, "foo-service.ts"));
+        var content = File.ReadAllText(Path.Combine(dir, "foo.service.contract.ts"));
         Assert.Contains("export interface IFooService {", content);
         Assert.Contains("FOO_SERVICE", content);
     }
@@ -46,7 +46,7 @@ public class ProgramTests : IDisposable
 
         Assert.Equal(0, exitCode);
         Assert.Contains("export interface IFooService {",
-            File.ReadAllText(Path.Combine(dir, "foo-service.ts")));
+            File.ReadAllText(Path.Combine(dir, "foo.service.contract.ts")));
     }
 
     [Fact] // L2-003 #3, L2-016 #3

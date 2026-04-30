@@ -33,7 +33,7 @@ public class LoggingTests : IDisposable
 
         Assert.Equal(0, exitCode);
         Assert.Contains("info:", stdout);
-        Assert.Contains(Path.Combine(dir, "foo-service.ts"), stdout);
+        Assert.Contains(Path.Combine(dir, "foo.service.contract.ts"), stdout);
         Assert.DoesNotContain("dbug:", stdout);
     }
 
@@ -61,7 +61,7 @@ public class LoggingTests : IDisposable
     public void Run_FileCollisionWithoutForce_EmitsExactlyOneErrorToStderr()
     {
         var dir = NewTempDir();
-        File.WriteAllText(Path.Combine(dir, "foo-service.ts"), "x");
+        File.WriteAllText(Path.Combine(dir, "foo.service.contract.ts"), "x");
 
         var (_, stderr, _) = RunMain("--name", "IFooService", "--output", dir);
 

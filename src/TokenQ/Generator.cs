@@ -48,4 +48,6 @@ public sealed class Generator(ILogger<Generator>? logger = null)
 
     internal static string[] SplitWords(string name) =>
         Regex.Split(name, "(?<=[a-z0-9])(?=[A-Z])");
+
+    internal static string ToPascalCase(string name) => throw new NotImplementedException();
 }
