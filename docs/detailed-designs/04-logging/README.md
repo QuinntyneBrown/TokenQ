@@ -1,5 +1,7 @@
 # 04 - Logging — Detailed Design
 
+**Status:** Accepted
+
 ## 1. Overview
 
 This slice adds `Microsoft.Extensions.Logging` to the existing classes. No new
