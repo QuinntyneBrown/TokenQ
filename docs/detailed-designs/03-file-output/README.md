@@ -1,5 +1,7 @@
 # 03 - File Output — Detailed Design
 
+**Status:** Accepted
+
 ## 1. Overview
 
 This slice replaces the "write content to stdout" step in slice 02 with a real
