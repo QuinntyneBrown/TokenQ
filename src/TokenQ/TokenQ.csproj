@@ -21,6 +21,8 @@
     <RepositoryType>git</RepositoryType>
     <PackageTags>angular;typescript;injection-token;codegen;dotnet-tool</PackageTags>
     <PackageReadmeFile>README.md</PackageReadmeFile>
+    <IncludeSymbols>false</IncludeSymbols>
+    <DebugType>embedded</DebugType>
   </PropertyGroup>
 
   <ItemGroup>
