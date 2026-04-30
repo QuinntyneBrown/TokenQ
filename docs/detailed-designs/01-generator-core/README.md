@@ -1,6 +1,6 @@
 # 01 - Generator Core — Detailed Design
 
-**Status:** Accepted
+**Status:** Complete
 
 ## 1. Overview
 

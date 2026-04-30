@@ -31,7 +31,7 @@ to be feature-complete in order to begin.
 
 | #  | Feature | Status | What the user can observe after this slice | L2 IDs |
 |----|---------|--------|---------------------------------------------|--------|
-| 01 | [Generator Core](01-generator-core/README.md) | Accepted | Calling `Generator.Render("IFooService")` returns the exact bytes that will be written to `foo-service.ts`. | L2-001, L2-002, L2-005, L2-007, L2-009, L2-015 |
+| 01 | [Generator Core](01-generator-core/README.md) | Complete | Calling `Generator.Render("IFooService")` returns the exact bytes that will be written to `foo-service.ts`. | L2-001, L2-002, L2-005, L2-007, L2-009, L2-015 |
 | 02 | [CLI Shell](02-cli-shell/README.md) | Draft | `tokenq --name IFooService` parses arguments, calls the generator, prints content to stdout, and exits with the right code. | L2-003, L2-004 (option binding), L2-011, L2-016 |
 | 03 | [File Output](03-file-output/README.md) | Draft | `tokenq --name IFooService --output ./svc` writes the file to disk safely with overwrite control. | L2-004 (write), L2-006, L2-008 |
 | 04 | [Logging](04-logging/README.md) | Draft | Success and failure paths emit the right log levels to the right streams; `--verbose` reveals debug detail. | L2-010, L2-011 (verbose stack trace) |
