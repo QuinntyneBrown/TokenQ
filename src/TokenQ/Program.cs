@@ -9,6 +9,7 @@ public static class Program
     {
         var services = new ServiceCollection();
         services.AddSingleton<Generator>();
+        services.AddSingleton<FileWriter>();
         using var provider = services.BuildServiceProvider();
         return BuildRootCommand(provider).InvokeAsync(args).GetAwaiter().GetResult();
     }
@@ -33,14 +34,19 @@ public static class Program
         {
             var name = context.ParseResult.GetValueForOption(nameOption)!;
             var output = context.ParseResult.GetValueForOption(outputOption);
+            var force = context.ParseResult.GetValueForOption(forceOption);
             var verbose = context.ParseResult.GetValueForOption(verboseOption);
             try
             {
                 var generated = provider.GetRequiredService<Generator>().Render(name);
-                if (output is not null) _ = Path.GetFullPath(output);
-                Console.Out.Write(generated.Content);
+                provider.GetRequiredService<FileWriter>().Write(output, generated, force);
             }
             catch (InvalidNameException ex)
+            {
+                Console.Error.WriteLine(ex.Message);
+                context.ExitCode = 1;
+            }
+            catch (Exception ex) when (ex is IOException or UnauthorizedAccessException)
             {
                 Console.Error.WriteLine(ex.Message);
                 context.ExitCode = 1;
