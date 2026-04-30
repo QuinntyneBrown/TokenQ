@@ -1,6 +1,6 @@
 # 04 - Logging — Detailed Design
 
-**Status:** Accepted
+**Status:** Complete
 
 ## 1. Overview
 
