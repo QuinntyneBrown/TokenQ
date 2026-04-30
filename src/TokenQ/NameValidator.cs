@@ -10,8 +10,8 @@ internal abstract record ValidationResult
 
 internal static class NameValidator
 {
-    private static readonly Regex Identifier =
-        new(@"^[A-Za-z_$][A-Za-z0-9_$]*$", RegexOptions.Compiled);
+    private static readonly Regex Allowed =
+        new(@"^[A-Za-z][A-Za-z0-9-]*$", RegexOptions.Compiled);
 
     private static readonly HashSet<string> Reserved = new(StringComparer.Ordinal)
     {
@@ -31,10 +31,18 @@ internal static class NameValidator
             return new ValidationResult.Failed("name must be 200 characters or fewer");
         if (name.Any(char.IsWhiteSpace))
             return new ValidationResult.Failed("name must not contain whitespace");
-        if (!Identifier.IsMatch(name))
-            return new ValidationResult.Failed($"'{name}' is not a valid TypeScript identifier");
-        if (Reserved.Contains(name))
+        if (!char.IsAsciiLetter(name[0]))
+            return new ValidationResult.Failed("name must begin with an ASCII letter");
+        if (!Allowed.IsMatch(name))
+            return new ValidationResult.Failed("only ASCII letters, digits, and '-' are permitted");
+        if (name.EndsWith('-'))
+            return new ValidationResult.Failed("name must not end with '-'");
+        if (name.Contains("--"))
+            return new ValidationResult.Failed("name must not contain consecutive '-'");
+        if (Reserved.Contains(name.ToLowerInvariant()))
             return new ValidationResult.Failed($"'{name}' is a TypeScript reserved word");
+        if (Generator.FileTypes.Contains(Generator.ToPascalCase(name)))
+            return new ValidationResult.Failed("name must include a base portion in addition to the file-type suffix");
         return new ValidationResult.Ok();
     }
 }
