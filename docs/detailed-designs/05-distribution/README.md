@@ -1,5 +1,7 @@
 # 05 - Distribution — Detailed Design
 
+**Status:** Accepted
+
 ## 1. Overview
 
 This slice ships the tool. After it lands, `dotnet pack` produces a NuGet
