@@ -1,6 +1,6 @@
 # 06 - Name Derivation — Detailed Design
 
-**Status:** Draft
+**Status:** Accepted
 
 ## 1. Overview
 

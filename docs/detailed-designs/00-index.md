@@ -36,7 +36,7 @@ to be feature-complete in order to begin.
 | 03 | [File Output](03-file-output/README.md) | Complete | `tokenq --name IFooService --output ./svc` writes the file to disk safely with overwrite control. | L2-004 (write), L2-006, L2-008 |
 | 04 | [Logging](04-logging/README.md) | Complete | Success and failure paths emit the right log levels to the right streams; `--verbose` reveals debug detail. | L2-010, L2-011 (verbose stack trace) |
 | 05 | [Distribution](05-distribution/README.md) | Complete | `dotnet pack` produces a NuGet `.nupkg` that installs as a global tool and starts within the performance budget. | L2-012, L2-013, L2-014 |
-| 06 | [Name Derivation](06-name-derivation/README.md) | Draft | `Generator.Render("EventStore")` yields `event.store.contract.ts` with `IEventStore` + `EVENT_STORE`; `commandService` and `data-mode-controller` work likewise. | L2-001, L2-002, L2-005, L2-007, L2-015, L2-017, L2-018 |
+| 06 | [Name Derivation](06-name-derivation/README.md) | Accepted | `Generator.Render("EventStore")` yields `event.store.contract.ts` with `IEventStore` + `EVENT_STORE`; `commandService` and `data-mode-controller` work likewise. | L2-001, L2-002, L2-005, L2-007, L2-015, L2-017, L2-018 |
 
 Slice 06 refines slice 01: it changes how the generator turns a user-supplied
 name into an interface name, token, and filename. Tests written against the
