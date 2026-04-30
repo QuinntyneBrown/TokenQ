@@ -1,0 +1,20 @@
+@startuml c4_container
+!theme plain
+!include <C4/C4_Container>
+
+title TokenQ - Container Diagram
+
+Person(dev, "Developer")
+
+System_Boundary(tq, "TokenQ CLI") {
+    Container(proc, "tokenq process", ".NET 8 console app", "Parses argv, validates, generates TS, writes file")
+}
+
+System_Ext(fs, "Local Filesystem", "Hosts the output directory")
+System_Ext(con, "Console", "stdout, stderr, exit code")
+
+Rel(dev, proc, "Invokes", "argv")
+Rel(proc, fs, "Reads/Writes", "File I/O")
+Rel(proc, con, "Logs + result", "stdout / stderr")
+
+@enduml

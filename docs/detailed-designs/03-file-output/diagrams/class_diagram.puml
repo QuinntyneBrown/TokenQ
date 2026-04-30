@@ -1,0 +1,35 @@
+@startuml class_diagram
+!theme plain
+skinparam classAttributeIconSize 0
+skinparam classFontSize 12
+
+title File Output - Domain Model
+
+class FileWriter {
+    +Write(outputDirectory: string?, file: GeneratedFile, force: bool): string
+}
+
+class GeneratedFile <<record (slice 01)>> {
+    +Filename: string
+    +Content: string
+}
+
+class IOException <<BCL>>
+
+class FileAlreadyExistsException <<exception>>
+class OutputPathOutsideDirectoryException <<exception>>
+class OutputPathIsFileException <<exception>>
+class InvalidOutputPathException <<exception>>
+
+IOException <|-- FileAlreadyExistsException
+IOException <|-- OutputPathOutsideDirectoryException
+IOException <|-- OutputPathIsFileException
+IOException <|-- InvalidOutputPathException
+
+FileWriter ..> GeneratedFile : reads
+FileWriter ..> FileAlreadyExistsException : throws
+FileWriter ..> OutputPathOutsideDirectoryException : throws
+FileWriter ..> OutputPathIsFileException : throws
+FileWriter ..> InvalidOutputPathException : throws
+
+@enduml

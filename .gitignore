@@ -1,0 +1,7 @@
+bin/
+obj/
+.vs/
+*.user
+*.suo
+TestResults/
+.claude/scheduled_tasks.lock

@@ -1,0 +1,42 @@
+@startuml class_diagram
+!theme plain
+skinparam classAttributeIconSize 0
+skinparam classFontSize 12
+
+title Generator Core - Domain Model
+
+class Generator {
+    +Render(interfaceName: string): GeneratedFile
+    -SplitWords(bareName: string): string[]
+    -ToKebabCase(bareName: string): string
+    -ToScreamingSnakeCase(bareName: string): string
+    -StripLeadingI(name: string): string
+}
+
+class "NameValidator <<static>>" as NameValidator {
+    +Validate(name: string): ValidationResult
+}
+
+class GeneratedFile <<record>> {
+    +Filename: string
+    +Content: string
+}
+
+abstract class ValidationResult <<record>>
+class "ValidationResult.Ok" as VOk <<record>>
+class "ValidationResult.Failed" as VFail <<record>> {
+    +Message: string
+}
+
+class InvalidNameException <<exception>> {
+    +Message: string
+}
+
+Generator ..> NameValidator : calls
+Generator ..> GeneratedFile : returns
+Generator ..> InvalidNameException : throws on invalid name
+NameValidator ..> ValidationResult : returns
+ValidationResult <|-- VOk
+ValidationResult <|-- VFail
+
+@enduml

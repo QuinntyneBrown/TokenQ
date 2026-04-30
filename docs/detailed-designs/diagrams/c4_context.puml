@@ -1,0 +1,19 @@
+@startuml c4_context
+!theme plain
+!include <C4/C4_Context>
+
+title TokenQ - System Context
+
+Person(dev, "Developer", "Generates Angular InjectionToken files for a frontend project")
+
+System(tokenq, "TokenQ CLI", ".NET 8 global tool that emits one TypeScript file per invocation")
+
+System_Ext(fs, "Local Filesystem", "Stores the generated .ts file")
+System_Ext(shell, "Developer Shell", "Provides argv, stdout, stderr, exit code")
+
+Rel(dev, shell, "Invokes", "tokenq --name ...")
+Rel(shell, tokenq, "Runs process", "argv")
+Rel(tokenq, fs, "Writes", "file write")
+Rel(tokenq, shell, "Emits", "stdout / stderr / exit code")
+
+@enduml

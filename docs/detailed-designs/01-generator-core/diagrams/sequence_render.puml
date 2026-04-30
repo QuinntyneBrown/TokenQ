@@ -1,0 +1,32 @@
+@startuml sequence_render
+!theme plain
+skinparam sequenceMessageAlign center
+
+title Generator.Render - Happy Path and Validation Failure
+
+participant "Caller\n(CLI shell or test)" as C
+participant "Generator" as G
+participant "NameValidator\n<<static>>" as V
+
+C -> G : Render("IFooService")
+G -> V : Validate("IFooService")
+V --> G : Ok
+
+note over G
+  StripLeadingI -> "FooService"
+  SplitWords    -> ["Foo","Service"]
+  kebab         -> "foo-service"
+  screamingSnake-> "FOO_SERVICE"
+  fill template, normalise to LF
+end note
+
+G --> C : GeneratedFile {\n  Filename = "foo-service.ts",\n  Content  = "...\\n"\n}
+
+== Validation failure path ==
+
+C -> G : Render("1Foo")
+G -> V : Validate("1Foo")
+V --> G : Failed("Name must start with a letter, '_' or '$'")
+G --> C : throw InvalidNameException(message)
+
+@enduml

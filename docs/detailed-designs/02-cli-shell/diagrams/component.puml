@@ -1,0 +1,26 @@
+@startuml component
+!theme plain
+!include <C4/C4_Component>
+
+title CLI Shell - Component Diagram
+
+Container_Boundary(proc, "tokenq process") {
+    Component(prog, "Program.Main", "static C# entry point", "Builds DI, builds RootCommand, invokes parser, maps exit codes")
+    Component(rc,   "RootCommand",    "System.CommandLine",     "Defines --name/--output/--force/--verbose/--help/--version")
+    Component(hdl,  "Handler",        "delegate inside Program", "Resolves Generator, runs pipeline, returns int")
+    Component(di,   "ServiceProvider","Microsoft.Extensions.DI", "Holds Generator (and later FileWriter, ILogger)")
+    Component(gen,  "Generator",      "C# class (slice 01)",     "Pure name -> GeneratedFile")
+}
+
+System_Ext(argv, "argv / Console", "Process arguments and stdout/stderr")
+
+Rel(argv, prog, "argv")
+Rel(prog, di,   "configures + builds")
+Rel(prog, rc,   "configures")
+Rel(prog, rc,   "InvokeAsync(args)")
+Rel(rc,   hdl,  "invokes")
+Rel(hdl,  di,   "resolves")
+Rel(hdl,  gen,  "Render(name)")
+Rel(hdl,  argv, "writes content / errors")
+
+@enduml

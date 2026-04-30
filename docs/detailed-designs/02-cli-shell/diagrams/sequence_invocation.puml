@@ -1,0 +1,39 @@
+@startuml sequence_invocation
+!theme plain
+skinparam sequenceMessageAlign center
+
+title tokenq --name IFooService (slice 02 stops at stdout)
+
+actor Developer
+participant "Program.Main" as P
+participant "ServiceProvider" as SP
+participant "RootCommand\n(System.CommandLine)" as RC
+participant "Handler\ndelegate" as H
+participant "Generator" as G
+participant "Console.Out" as Out
+
+Developer -> P : argv = [--name, IFooService]
+P -> SP : build (register Generator)
+P -> RC : configure options + handler
+P -> RC : InvokeAsync(argv)
+
+RC -> RC : parse argv\n(missing/unknown -> non-zero)
+RC -> H  : invoke(name, output, force, verbose)
+H -> SP : GetService<Generator>()
+SP --> H : Generator
+H -> G : Render("IFooService")
+G --> H : GeneratedFile
+H -> Out : Write(content)
+H --> RC : 0
+RC --> P : 0
+P --> Developer : exit 0
+
+== Failure path: invalid name ==
+
+H -> G : Render("1Foo")
+G --> H : throw InvalidNameException
+H --> P : exception bubbles
+P -> P : map to exit 1, write message to stderr
+P --> Developer : exit 1
+
+@enduml

@@ -1,0 +1,44 @@
+@startuml sequence_write
+!theme plain
+skinparam sequenceMessageAlign center
+
+title FileWriter.Write - Decision Flow
+
+participant "Handler\n(slice 02)" as H
+participant "FileWriter" as FW
+participant "Path / File / Directory\n(BCL)" as BCL
+participant "Filesystem" as FS
+
+H -> FW : Write(outputDirectory, file, force)
+
+FW -> BCL : GetFullPath(outputDirectory ?? cwd)
+BCL --> FW : dirAbsolute
+
+FW -> BCL : GetFullPath(Combine(dirAbsolute, file.Filename))
+note right
+  catch ArgumentException / NotSupportedException
+  -> throw InvalidOutputPathException
+end note
+BCL --> FW : fileAbsolute
+
+alt fileAbsolute not under dirAbsolute
+    FW --> H : throw OutputPathOutsideDirectoryException
+end
+
+alt dirAbsolute exists as a file
+    FW --> H : throw OutputPathIsFileException
+end
+
+alt File.Exists(fileAbsolute) and !force
+    FW --> H : throw FileAlreadyExistsException
+end
+
+FW -> BCL : Directory.CreateDirectory(dirAbsolute)
+BCL -> FS : create dir (recursive)
+
+FW -> BCL : File.WriteAllBytes(fileAbsolute, UTF8(file.Content))
+BCL -> FS : write bytes
+
+FW --> H : fileAbsolute
+
+@enduml

@@ -1,0 +1,39 @@
+@startuml sequence_error
+!theme plain
+skinparam sequenceMessageAlign center
+
+title Failure Path with Logging
+
+participant "Handler" as H
+participant "Generator" as G
+participant "FileWriter" as FW
+participant "ILogger" as L
+participant "stderr" as Err
+
+== Invalid name (validation failure -> exit 1) ==
+
+H -> G : Render("1Foo")
+G --> H : throw InvalidNameException("Name must start with a letter, '_' or '$'")
+
+H -> L : Error "Name must start with a letter, '_' or '$'"
+L -> Err : "fail: Name must start with a letter, '_' or '$'"
+note right of L
+  exactly one Error message
+  -> exit 1
+end note
+
+== Unhandled exception (-> exit 2) ==
+
+H -> FW : Write(...)
+FW --> H : throw NullReferenceException(...)
+
+H -> L : Error "Unexpected internal error"
+L -> Err : "fail: Unexpected internal error"
+
+alt --verbose
+    H -> Err : ex.ToString()  (raw stack trace, NOT via ILogger)
+end
+
+H --> H : return 2
+
+@enduml

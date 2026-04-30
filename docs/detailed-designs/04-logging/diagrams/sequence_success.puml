@@ -1,0 +1,31 @@
+@startuml sequence_success
+!theme plain
+skinparam sequenceMessageAlign center
+
+title Successful Run with Logging (--verbose off)
+
+participant "Handler" as H
+participant "Generator" as G
+participant "FileWriter" as FW
+participant "ILogger\n(SimpleConsole)" as L
+participant "stdout" as Out
+participant "stderr" as Err
+
+H -> G : Render(name)
+G -> L : Debug "Rendering interface=... ..."
+note right of L : Debug suppressed when --verbose off
+G --> H : GeneratedFile
+
+H -> FW : Write(dir, file, force)
+FW -> L : Debug "Resolved directory=... file=..."
+note right of L : Debug suppressed
+FW -> L : Debug "Write force=... preExisting=..."
+note right of L : Debug suppressed
+FW --> H : absolutePath
+
+H -> L : Information "Wrote {Path}"
+L -> Out : "info: Wrote /abs/foo-service.ts"
+
+H --> H : return 0
+
+@enduml
