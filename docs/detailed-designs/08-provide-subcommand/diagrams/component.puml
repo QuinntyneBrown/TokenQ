@@ -1,0 +1,31 @@
+@startuml component
+!theme plain
+!include <C4/C4_Component>
+
+title provide Sub-command - Component Diagram
+
+Person(dev, "Developer")
+
+Container_Boundary(tq, "tokenq process") {
+    Component(prog, "Program", "static class", "Composition root + sub-command builder")
+    Component(rootCmd, "RootCommand", "System.CommandLine", "tokenq --name X (slice 02, untouched)")
+    Component(provCmd, "provide Command", "System.CommandLine", "tokenq provide [--path X] (new)")
+    Component(provHand, "provide handler", "delegate", "Resolves dir, scans, calls BarrelGenerator + FileWriter")
+    Component(bg, "BarrelGenerator", "C# class", "Pure: names -> index.ts content (slice 07)")
+    Component(fw, "FileWriter", "C# class", "Writes UTF-8 LF, refuses to overwrite without --force (slice 03)")
+    Component(genHand, "root handler", "delegate", "Existing contract generation (slice 02)")
+}
+
+ContainerDb(fs, "Local Filesystem", "Target directory + index.ts")
+
+Rel(dev, prog, "argv", "tokenq provide --path X")
+Rel(prog, rootCmd, "Builds + adds")
+Rel(prog, provCmd, "Builds + adds as sub-command")
+Rel(rootCmd, genHand, "Invokes")
+Rel(provCmd, provHand, "Invokes")
+Rel(provHand, fs, "Enumerates files", "EnumerateFiles top-level only")
+Rel(provHand, bg, "Render(folderName, fileNames)")
+Rel(provHand, fw, "Write(target, generated, force)")
+Rel(fw, fs, "Writes index.ts", "UTF-8 LF")
+
+@enduml

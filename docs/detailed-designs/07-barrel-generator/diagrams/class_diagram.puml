@@ -1,0 +1,59 @@
+@startuml class_diagram
+!theme plain
+skinparam classAttributeIconSize 0
+skinparam classFontSize 12
+
+title Barrel Generator - Domain Model
+
+class BarrelGenerator {
+    +Render(folderName: string, fileNames: IReadOnlyList<string>): GeneratedFile
+    -ClassifyFiles(names: IReadOnlyList<string>): (Contract[], Implementation[], Model[])
+    -DeriveContract(filename: string, type: FileType?): Contract
+    -DeriveImplementation(filename: string, type: FileType): Implementation
+    -DeriveFunctionName(folderName: string): string
+    -PairContractsToImpls(contracts, impls): (Pair[], OrphanContract[], OrphanImpl[])
+    -RenderTemplate(...): string
+    {static} -WordToPascal(word: string): string
+}
+
+class GeneratedFile <<record (slice 01)>> {
+    +Filename: string
+    +Content: string
+}
+
+class "Contract <<private record>>" as Contract {
+    +FileName: string
+    +ImportPath: string
+    +TokenName: string
+    +InterfaceName: string
+    +CommonBase: string
+}
+
+class "Implementation <<private record>>" as Implementation {
+    +FileName: string
+    +ImportPath: string
+    +ClassName: string
+    +CommonBase: string
+}
+
+class InvalidFolderNameException <<exception>> {
+    +Message: string
+}
+
+BarrelGenerator ..> GeneratedFile : returns
+BarrelGenerator ..> Contract : builds
+BarrelGenerator ..> Implementation : builds
+BarrelGenerator ..> InvalidFolderNameException : throws on invalid folder name
+
+note right of BarrelGenerator
+  Pure: no I/O.
+  All helpers are private static.
+  Optional ILogger for Debug + Warning.
+end note
+
+note left of Contract
+  Private to BarrelGenerator.
+  Never escapes the class.
+end note
+
+@enduml

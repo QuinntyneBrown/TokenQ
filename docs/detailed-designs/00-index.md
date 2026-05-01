@@ -37,6 +37,7 @@ to be feature-complete in order to begin.
 | 04 | [Logging](04-logging/README.md) | Complete | Success and failure paths emit the right log levels to the right streams; `--verbose` reveals debug detail. | L2-010, L2-011 (verbose stack trace) |
 | 05 | [Distribution](05-distribution/README.md) | Complete | `dotnet pack` produces a NuGet `.nupkg` that installs as a global tool and starts within the performance budget. | L2-012, L2-013, L2-014 |
 | 06 | [Name Derivation](06-name-derivation/README.md) | Complete | `Generator.Render("EventStore")` yields `event.store.contract.ts` with `IEventStore` + `EVENT_STORE`; `commandService` and `data-mode-controller` work likewise. | L2-001, L2-002, L2-005, L2-007, L2-015, L2-017, L2-018 |
+| 07 | [Barrel Generator](07-barrel-generator/README.md) | Accepted | `BarrelGenerator.Render("dashboard-state", filenames)` returns the bytes of an Angular `index.ts` that re-exports classes/tokens/types and exposes a `provideDashboardState()` function. | L2-021, L2-022, L2-023, L2-024, L2-025, L2-026, L2-027, L2-028, L2-030 |
 
 Slice 06 refines slice 01: it changes how the generator turns a user-supplied
 name into an interface name, token, and filename. Tests written against the

@@ -10,8 +10,9 @@ services, stores, managers, or any other injectable abstraction.
 
 ---
 
-> One command turns an interface name into a deterministic Angular token file.
-> TokenQ keeps the generator small, local, testable, and safe by default.
+> One command turns a name into a deterministic Angular contract file with
+> a typed `InjectionToken`. TokenQ keeps the generator small, local,
+> testable, and safe by default.
 
 ## Why TokenQ
 
@@ -28,53 +29,67 @@ deterministic TypeScript file, and writes it to the requested directory.
 
 ## Quick Start
 
+### Install from NuGet
+
+```powershell
+dotnet tool install --global TokenQ
+tokenq --name EventStore --output ./generated
+```
+
+The command writes `generated/event.store.contract.ts`. To upgrade an existing
+install, swap `install` for `update`.
+
 ### Run from source
 
 ```powershell
 dotnet restore
-dotnet run --project src/TokenQ -- --name IFooService --output ./generated
+dotnet run --project src/TokenQ -- --name EventStore --output ./generated
 ```
-
-The command writes `generated/foo-service.ts`.
 
 ### Pack and install locally
 
 ```powershell
 dotnet pack src/TokenQ/TokenQ.csproj -c Release -o ./.artifacts/packages
 dotnet tool install --global TokenQ --add-source ./.artifacts/packages
-tokenq --name IFooService --output ./generated
 ```
-
-If `TokenQ` is already installed, use `dotnet tool update --global TokenQ
---add-source ./.artifacts/packages`.
 
 ## What It Generates
 
 Input:
 
 ```powershell
-tokenq --name IFooService --output ./generated
+tokenq --name EventStore --output ./generated
 ```
 
-Output file: `generated/foo-service.ts`
+Output file: `generated/event.store.contract.ts`
 
 ```ts
 import { InjectionToken } from '@angular/core';
 
-export interface IFooService {
+export interface IEventStore {
 }
 
-export const FOO_SERVICE = new InjectionToken<IFooService>('FOO_SERVICE');
+export const EVENT_STORE = new InjectionToken<IEventStore>('EVENT_STORE');
 ```
 
-The current generator preserves the interface name supplied with `--name`.
-When deriving the file name and token constant, a leading `I` is removed only
-when it is followed by an uppercase letter.
+From a single name, TokenQ derives three things deterministically:
+
+- the **interface name** — PascalCase form of `--name`, prefixed with `I`
+  (skipped if the supplied name is already in `I<Pascal>` form),
+- the **`InjectionToken` constant and string** — SCREAMING_SNAKE_CASE of the
+  interface name with the leading `I` removed,
+- the **file name** — kebab-case, ending in `.contract.ts`. When the trailing
+  PascalCase word is one of the recognised file types `Store` or `Service`,
+  it is promoted to a dotted segment (`event.store.contract.ts`); otherwise
+  the kebab name is used flat (`data-mode-controller.contract.ts`).
+
+`--name` may be supplied in PascalCase (`EventStore`), camelCase
+(`commandService`), or kebab-case (`data-mode-controller`).
 
 ## CLI Reference
 
 ```text
-tokenq --name <interface-name>
+tokenq --name <name>
        [--output <directory>]
        [--force]
        [--verbose]
@@ -82,7 +97,7 @@ tokenq --name <interface-name>
 
 | Option | Alias | Description |
 |--------|-------|-------------|
-| `--name <interface-name>` | `-n` | Required TypeScript interface name. |
+| `--name <name>` | `-n` | Required. PascalCase, camelCase, or kebab-case name. The interface name, token, and file name are derived from it. |
 | `--output <directory>` | `-o` | Output directory. Defaults to the current working directory. |
 | `--force` | `-f` | Overwrite the target file when it already exists. |
 | `--verbose` | `-v` | Print detailed unexpected exception information. |
@@ -99,21 +114,28 @@ Exit codes:
 
 ## Naming Rules
 
-`--name` must be a valid TypeScript identifier:
+`--name` must be a non-empty string of:
 
 - 1 to 200 characters.
-- No whitespace.
-- Must begin with an ASCII letter, `_`, or `$`.
-- May contain ASCII letters, digits, `_`, or `$`.
-- Must not be a TypeScript reserved word.
+- ASCII letters, digits, and the kebab separator `-` only.
+- The first character must be an ASCII letter.
+- No leading or trailing `-` and no consecutive `-`.
+- The normalised PascalCase form must not be a TypeScript reserved word.
+- The name must not be a bare recognised file-type word (`Store`, `Service`)
+  on its own — a base portion is required.
+
+Recognised file-type suffixes are exactly `Store` and `Service`. They are
+matched against the trailing PascalCase word of the normalised name.
 
 Examples:
 
-| Input | File | Token |
-|-------|------|-------|
-| `IFooService` | `foo-service.ts` | `FOO_SERVICE` |
-| `IUserAccountManager` | `user-account-manager.ts` | `USER_ACCOUNT_MANAGER` |
-| `Logger` | `logger.ts` | `LOGGER` |
+| Input | File | Interface | Token |
+|-------|------|-----------|-------|
+| `EventStore` | `event.store.contract.ts` | `IEventStore` | `EVENT_STORE` |
+| `commandService` | `command.service.contract.ts` | `ICommandService` | `COMMAND_SERVICE` |
+| `data-mode-controller` | `data-mode-controller.contract.ts` | `IDataModeController` | `DATA_MODE_CONTROLLER` |
+| `IUserAccountManager` | `user-account-manager.contract.ts` | `IUserAccountManager` | `USER_ACCOUNT_MANAGER` |
+| `Logger` | `logger.contract.ts` | `ILogger` | `LOGGER` |
 
 ## Safety Model
 
@@ -128,10 +150,12 @@ TokenQ applies a few conservative filesystem rules:
 
 ## Project Status
 
-TokenQ is pre-1.0. The implemented tool covers the current generator, CLI, file
-writer, validation, console logging, and test suite. The requirements and
-detailed designs also document planned work, including richer name derivation
-and release automation.
+TokenQ is pre-1.0 and published to nuget.org as
+[`TokenQ`](https://www.nuget.org/packages/TokenQ). All six design slices —
+generator core, CLI shell, file output, logging, distribution, and name
+derivation — are complete. Every push to `main` runs the test suite, packs a
+new version `0.1.<run-number>`, and publishes to nuget.org via GitHub
+Actions.
 
 ## Documentation
 
@@ -169,7 +193,7 @@ The solution is intentionally small:
 src/TokenQ/
   Program.cs        # CLI composition root
   Generator.cs      # pure TypeScript file generator
-  NameValidator.cs  # TypeScript identifier validation
+  NameValidator.cs  # name format validation (letters, digits, '-')
   FileWriter.cs     # safe local file writes
 
 tests/TokenQ.Tests/

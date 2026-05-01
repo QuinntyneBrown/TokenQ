@@ -1,0 +1,79 @@
+@startuml sequence_render
+!theme plain
+skinparam sequenceMessageAlign center
+
+title BarrelGenerator.Render - Classification, Pairing, Templating
+
+participant "Caller\n(provide handler\nor unit test)" as C
+participant "BarrelGenerator" as BG
+participant "StringBuilder" as SB
+
+C -> BG : Render("dashboard-state",\n[\n  "dashboard-state-store.contract.ts",\n  "dashboard-state.store.ts",\n  "wall-clock-tick-service.contract.ts",\n  "wall-clock-tick.service.ts",\n  "dashboard-state.model.ts",\n  "chart-visible-window.ts"\n])
+
+note over BG
+  Validate folderName
+  matches kebab regex.
+end note
+
+note over BG
+  Classify each name:
+  *.contract.ts        -> Contract
+  *.store.ts           -> Implementation(Store)
+  *.service.ts         -> Implementation(Service)
+  *.model.ts           -> Model
+  anything else        -> Other (drop)
+end note
+
+note over BG
+  Derive symbols:
+  Contract dashboard-state-store
+    -> token DASHBOARD_STATE_STORE
+    -> iface IDashboardStateStore
+    -> commonBase "dashboard-state"
+  Impl dashboard-state.store
+    -> class DashboardStateStore
+    -> commonBase "dashboard-state"
+  (analogous for wall-clock-tick)
+end note
+
+note over BG
+  Pair by commonBase:
+  ("dashboard-state",
+   DASHBOARD_STATE_STORE
+   <-> DashboardStateStore)
+  ("wall-clock-tick",
+   WALL_CLOCK_TICK_SERVICE
+   <-> WallClockTickService)
+  Orphans -> Warning log.
+end note
+
+BG -> SB : Append imports + exports + provideXxx body
+note right
+  Sort impls / contracts / models
+  by source file name.
+  Sort provider array entries
+  by class name then by token name.
+  Use \n line endings throughout.
+end note
+SB --> BG : content string
+
+BG --> C : GeneratedFile {\n  Filename = "index.ts",\n  Content  = "..." \n}
+
+== Empty folder ==
+
+C -> BG : Render("empty-feature", [])
+note over BG
+  No files. Return:
+  import + blank +
+  provideEmptyFeature() {
+    return [];
+  }
+end note
+BG --> C : GeneratedFile { ... }
+
+== Invalid folder name ==
+
+C -> BG : Render("Bad Name", [...])
+BG --> C : throw InvalidFolderNameException
+
+@enduml
