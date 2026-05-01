@@ -1,6 +1,6 @@
 # 08 - `provide` Sub-command — Detailed Design
 
-**Status:** Accepted
+**Status:** Complete
 
 ## 1. Overview
 
