@@ -156,3 +156,6 @@ public sealed class BarrelGenerator(ILogger<BarrelGenerator>? logger = null)
 
 public sealed class InvalidFolderNameException(string folderName)
     : Exception($"Folder name '{folderName}' is not a valid kebab-case identifier.");
+
+public sealed class TargetDirectoryNotFoundException(string path)
+    : IOException($"Target directory not found: {path}");
