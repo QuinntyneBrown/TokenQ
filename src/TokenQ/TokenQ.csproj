@@ -10,7 +10,7 @@
     <PackAsTool>true</PackAsTool>
     <ToolCommandName>tokenq</ToolCommandName>
     <PackageId>TokenQ</PackageId>
-    <Version>0.1.0</Version>
+    <Version>0.1.6</Version>
     <Authors>Quinntyne Brown</Authors>
     <Company>TokenQ contributors</Company>
     <Product>TokenQ</Product>

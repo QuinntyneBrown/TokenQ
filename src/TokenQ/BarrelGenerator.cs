@@ -70,19 +70,24 @@ public sealed class BarrelGenerator(ILogger<BarrelGenerator>? logger = null)
                 _logger.LogWarning("Unpaired implementation class: {Class}", impl.ClassName);
 
         var sb = new StringBuilder();
-        sb.Append("import { Provider } from '@angular/core';\n\n");
-
-        var hasReexports = impls.Count + contracts.Count + models.Count > 0;
+        sb.Append("import { Provider } from '@angular/core';\n");
 
         foreach (var impl in impls)
-            sb.Append($"export {{ {impl.ClassName} }} from '{impl.ImportPath}';\n");
+            sb.Append($"import {{ {impl.ClassName} }} from '{impl.ImportPath}';\n");
         foreach (var c in contracts)
-            sb.Append($"export {{ {c.TokenName} }} from '{c.ImportPath}';\n");
+            sb.Append($"import {{ {c.TokenName} }} from '{c.ImportPath}';\n");
+        sb.Append('\n');
+
+        foreach (var impl in impls)
+            sb.Append($"export {{ {impl.ClassName} }};\n");
+        foreach (var c in contracts)
+            sb.Append($"export {{ {c.TokenName} }};\n");
         foreach (var c in contracts)
             sb.Append($"export type {{ {c.InterfaceName} }} from '{c.ImportPath}';\n");
         foreach (var m in models)
             sb.Append($"export type * from './{m[..^3]}';\n");
 
+        var hasReexports = impls.Count + contracts.Count + models.Count > 0;
         if (hasReexports) sb.Append('\n');
 
         var fnName = "provide" + WordsToPascal(folder.Split('-'));

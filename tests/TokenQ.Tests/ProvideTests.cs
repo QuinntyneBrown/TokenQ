@@ -48,11 +48,15 @@ public class ProvideTests : IDisposable
         Assert.Equal(0, exitCode);
         var expected =
             "import { Provider } from '@angular/core';\n" +
+            "import { DashboardStateStore } from './dashboard-state.store';\n" +
+            "import { WallClockTickService } from './wall-clock-tick.service';\n" +
+            "import { DASHBOARD_STATE_STORE } from './dashboard-state-store.contract';\n" +
+            "import { WALL_CLOCK_TICK_SERVICE } from './wall-clock-tick-service.contract';\n" +
             "\n" +
-            "export { DashboardStateStore } from './dashboard-state.store';\n" +
-            "export { WallClockTickService } from './wall-clock-tick.service';\n" +
-            "export { DASHBOARD_STATE_STORE } from './dashboard-state-store.contract';\n" +
-            "export { WALL_CLOCK_TICK_SERVICE } from './wall-clock-tick-service.contract';\n" +
+            "export { DashboardStateStore };\n" +
+            "export { WallClockTickService };\n" +
+            "export { DASHBOARD_STATE_STORE };\n" +
+            "export { WALL_CLOCK_TICK_SERVICE };\n" +
             "export type { IDashboardStateStore } from './dashboard-state-store.contract';\n" +
             "export type { IWallClockTickService } from './wall-clock-tick-service.contract';\n" +
             "export type * from './dashboard-state.model';\n" +

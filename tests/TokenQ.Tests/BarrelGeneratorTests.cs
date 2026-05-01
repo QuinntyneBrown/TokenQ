@@ -17,8 +17,10 @@ public class BarrelGeneratorTests
         var f = Render("event", "event.store.ts", "event.store.contract.ts");
 
         Assert.Equal("index.ts", f.Filename);
-        Assert.Contains("export { EventStore } from './event.store';", f.Content);
-        Assert.Contains("export { EVENT_STORE } from './event.store.contract';", f.Content);
+        Assert.Contains("import { EventStore } from './event.store';", f.Content);
+        Assert.Contains("import { EVENT_STORE } from './event.store.contract';", f.Content);
+        Assert.Contains("export { EventStore };", f.Content);
+        Assert.Contains("export { EVENT_STORE };", f.Content);
         Assert.Contains("export type { IEventStore } from './event.store.contract';", f.Content);
         Assert.Contains("export function provideEvent(): Provider[]", f.Content);
         Assert.Contains("EventStore,", f.Content);
@@ -30,8 +32,10 @@ public class BarrelGeneratorTests
     {
         var f = Render("command", "command.service.ts", "command.service.contract.ts");
 
-        Assert.Contains("export { CommandService } from './command.service';", f.Content);
-        Assert.Contains("export { COMMAND_SERVICE } from './command.service.contract';", f.Content);
+        Assert.Contains("import { CommandService } from './command.service';", f.Content);
+        Assert.Contains("import { COMMAND_SERVICE } from './command.service.contract';", f.Content);
+        Assert.Contains("export { CommandService };", f.Content);
+        Assert.Contains("export { COMMAND_SERVICE };", f.Content);
         Assert.Contains("export type { ICommandService } from './command.service.contract';", f.Content);
         Assert.Contains("{ provide: COMMAND_SERVICE, useExisting: CommandService }", f.Content);
     }
@@ -43,8 +47,10 @@ public class BarrelGeneratorTests
             "dashboard-state-store.contract.ts",
             "dashboard-state.store.ts");
 
-        Assert.Contains("export { DashboardStateStore } from './dashboard-state.store';", f.Content);
-        Assert.Contains("export { DASHBOARD_STATE_STORE } from './dashboard-state-store.contract';", f.Content);
+        Assert.Contains("import { DashboardStateStore } from './dashboard-state.store';", f.Content);
+        Assert.Contains("import { DASHBOARD_STATE_STORE } from './dashboard-state-store.contract';", f.Content);
+        Assert.Contains("export { DashboardStateStore };", f.Content);
+        Assert.Contains("export { DASHBOARD_STATE_STORE };", f.Content);
         Assert.Contains("export type { IDashboardStateStore } from './dashboard-state-store.contract';", f.Content);
         Assert.Contains("{ provide: DASHBOARD_STATE_STORE, useExisting: DashboardStateStore }", f.Content);
     }
@@ -54,7 +60,8 @@ public class BarrelGeneratorTests
     {
         var f = Render("user", "user.contract.ts");
 
-        Assert.Contains("export { USER } from './user.contract';", f.Content);
+        Assert.Contains("import { USER } from './user.contract';", f.Content);
+        Assert.Contains("export { USER };", f.Content);
         Assert.Contains("export type { IUser } from './user.contract';", f.Content);
         Assert.DoesNotContain("useExisting", f.Content);
     }
@@ -102,7 +109,7 @@ public class BarrelGeneratorTests
     {
         var f = Render("user", "user.contract.ts");
 
-        Assert.Contains("export { USER }", f.Content);
+        Assert.Contains("export { USER };", f.Content);
         Assert.DoesNotContain("useExisting", f.Content);
     }
 
@@ -111,7 +118,8 @@ public class BarrelGeneratorTests
     {
         var f = Render("orphan", "orphan.store.ts");
 
-        Assert.Contains("export { OrphanStore } from './orphan.store';", f.Content);
+        Assert.Contains("import { OrphanStore } from './orphan.store';", f.Content);
+        Assert.Contains("export { OrphanStore };", f.Content);
         Assert.Contains("OrphanStore", f.Content);
         Assert.DoesNotContain("useExisting", f.Content);
     }
@@ -183,6 +191,6 @@ public class BarrelGeneratorTests
 
         Assert.DoesNotContain("chart-visible-window", f.Content);
         Assert.DoesNotContain("spec", f.Content);
-        Assert.DoesNotContain("export { Index }", f.Content);
+        Assert.DoesNotContain("'./index'", f.Content);
     }
 }
