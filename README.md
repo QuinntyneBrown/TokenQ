@@ -34,10 +34,12 @@ deterministic TypeScript file, and writes it to the requested directory.
 ```powershell
 dotnet tool install --global TokenQ
 tokenq --name EventStore --output ./generated
+tokenq provide --path ./src/app/dashboard-state
 ```
 
-The command writes `generated/event.store.contract.ts`. To upgrade an existing
-install, swap `install` for `update`.
+The first command writes `generated/event.store.contract.ts`. The second scans
+a folder and writes `index.ts` with re-exports and a provider function. To
+upgrade an existing install, swap `install` for `update`.
 
 ### Run from source
 
@@ -54,6 +56,8 @@ dotnet tool install --global TokenQ --add-source ./.artifacts/packages
 ```
 
 ## What It Generates
+
+### Contract file
 
 Input:
 
@@ -86,14 +90,46 @@ From a single name, TokenQ derives three things deterministically:
 `--name` may be supplied in PascalCase (`EventStore`), camelCase
 (`commandService`), or kebab-case (`data-mode-controller`).
 
+### Barrel file (`provide`)
+
+Input:
+
+```powershell
+tokenq provide --path ./src/app/dashboard-state
+```
+
+Output file: `./src/app/dashboard-state/index.ts`
+
+```ts
+import { Provider } from '@angular/core';
+import { DASHBOARD_STATE } from './dashboard.state.store.contract';
+import { DashboardStateStore } from './dashboard-state.store';
+
+export function provideDashboardState(): Provider[] {
+  return [
+    DashboardStateStore,
+    { provide: DASHBOARD_STATE, useExisting: DashboardStateStore },
+  ];
+}
+```
+
+`provide` scans the target folder non-recursively, infers exports from
+recognised file-type suffixes (`store`, `service`, etc.), and generates
+an `index.ts` that re-exports tokens and classes and exposes a
+`provide<FolderName>()` function. Unknown files and subdirectories are
+ignored. The folder must already exist; `index.ts` is refused without
+`--force` if it already exists.
+
 ## CLI Reference
 
 ```text
-tokenq --name <name>
-       [--output <directory>]
-       [--force]
-       [--verbose]
+tokenq --name <name> [--output <directory>] [--force] [--verbose]
+tokenq provide       [--path <directory>]   [--force] [--verbose]
+tokenq --help | --version
+tokenq provide --help
 ```
+
+**Root command (contract generation)**
 
 | Option | Alias | Description |
 |--------|-------|-------------|
@@ -103,6 +139,15 @@ tokenq --name <name>
 | `--verbose` | `-v` | Print detailed unexpected exception information. |
 | `--help` | `-h` | Print command help. |
 | `--version` | | Print the package version. |
+
+**`provide` sub-command (barrel generation)**
+
+| Option | Alias | Description |
+|--------|-------|-------------|
+| `--path <directory>` | `-p` | Target directory to scan. Defaults to the current working directory. The directory must already exist. |
+| `--force` | `-f` | Overwrite `index.ts` when it already exists. |
+| `--verbose` | `-v` | Print detailed unexpected exception information. |
+| `--help` | `-h` | Print sub-command help. |
 
 Exit codes:
 
@@ -151,11 +196,11 @@ TokenQ applies a few conservative filesystem rules:
 ## Project Status
 
 TokenQ is pre-1.0 and published to nuget.org as
-[`TokenQ`](https://www.nuget.org/packages/TokenQ). All six design slices —
-generator core, CLI shell, file output, logging, distribution, and name
-derivation — are complete. Every push to `main` runs the test suite, packs a
-new version `0.1.<run-number>`, and publishes to nuget.org via GitHub
-Actions.
+[`TokenQ`](https://www.nuget.org/packages/TokenQ). All eight design slices —
+generator core, CLI shell, file output, logging, distribution, name derivation,
+barrel generator, and the `provide` sub-command — are complete. Every push to
+`main` runs the test suite, packs a new version `0.1.<run-number>`, and
+publishes to nuget.org via GitHub Actions.
 
 ## Documentation
 
@@ -169,6 +214,8 @@ Actions.
 - [Logging design](docs/detailed-designs/04-logging/README.md)
 - [Distribution design](docs/detailed-designs/05-distribution/README.md)
 - [Name derivation design](docs/detailed-designs/06-name-derivation/README.md)
+- [Barrel generator design](docs/detailed-designs/07-barrel-generator/README.md)
+- [`provide` sub-command design](docs/detailed-designs/08-provide-subcommand/README.md)
 - [Roadmap](ROADMAP.md)
 
 ## Development
@@ -191,13 +238,14 @@ The solution is intentionally small:
 
 ```text
 src/TokenQ/
-  Program.cs        # CLI composition root
-  Generator.cs      # pure TypeScript file generator
-  NameValidator.cs  # name format validation (letters, digits, '-')
-  FileWriter.cs     # safe local file writes
+  Program.cs           # CLI composition root — root command + provide sub-command
+  Generator.cs         # pure: name → (filename, interface, token, content)
+  NameValidator.cs     # pure: validates TS identifier rules
+  FileWriter.cs        # safe local file writes with overwrite control
+  BarrelGenerator.cs   # pure: folder + file names → index.ts barrel content
 
 tests/TokenQ.Tests/
-  *.cs              # xUnit acceptance and unit tests
+  *.cs                 # xUnit acceptance and unit tests
 ```
 
 ## Community
