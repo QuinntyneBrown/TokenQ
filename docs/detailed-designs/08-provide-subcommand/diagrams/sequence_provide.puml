@@ -1,0 +1,71 @@
+@startuml sequence_provide
+!theme plain
+skinparam sequenceMessageAlign center
+
+title tokenq provide --path ./dashboard-state - End-to-End
+
+actor Dev as D
+participant "Program.Main" as M
+participant "System.CommandLine\nparser" as P
+participant "provide handler" as H
+participant "Path / Directory\n(BCL)" as BCL
+participant "BarrelGenerator" as BG
+participant "FileWriter" as FW
+database "Filesystem" as FS
+
+D -> M : argv = ["provide", "--path", "./dashboard-state"]
+M -> P : InvokeAsync(args)
+P -> H : invoke with bound options\n(path, force, verbose)
+
+H -> BCL : Path.GetFullPath("./dashboard-state")
+BCL --> H : "C:\proj\dashboard-state"
+
+H -> BCL : Directory.Exists(...)
+BCL --> H : true
+
+H -> BCL : Path.GetFileName(target.TrimEnd(separators))
+BCL --> H : "dashboard-state"
+
+H -> BCL : Directory.EnumerateFiles(target, "*", TopDirectoryOnly).Select(GetFileName)
+BCL --> H : ["dashboard-state-store.contract.ts",\n "dashboard-state.store.ts",\n "wall-clock-tick-service.contract.ts",\n "wall-clock-tick.service.ts",\n "dashboard-state.model.ts"]
+
+H -> BG : Render("dashboard-state", fileNames)
+BG --> H : GeneratedFile {\n  Filename = "index.ts",\n  Content  = "..." }
+
+H -> FW : Write(target, generated, force)
+FW -> BCL : containment + collision checks
+FW -> FS : WriteAllBytes(...) UTF-8 LF
+FS --> FW : ok
+FW --> H : "C:\proj\dashboard-state\index.ts"
+
+H --> P : ExitCode = 0
+P --> M : 0
+M --> D : exit 0
+
+== Existing index.ts, no --force ==
+
+D -> M : tokenq provide --path ./dashboard-state
+M -> P : invoke
+P -> H : (path, force=false, verbose)
+H -> BG : Render(...)
+BG --> H : GeneratedFile
+H -> FW : Write(target, generated, force=false)
+FW -> FS : File.Exists(index.ts)?
+FS --> FW : true
+FW --> H : throw FileAlreadyExistsException
+H --> P : ExitCode = 1
+P --> M : 1
+M --> D : exit 1, error on stderr
+
+== Missing directory ==
+
+D -> M : tokenq provide --path ./does-not-exist
+M -> P : invoke
+P -> H : (path, force, verbose)
+H -> BCL : Directory.Exists(...)
+BCL --> H : false
+H --> P : throw TargetDirectoryNotFoundException\nExitCode = 1
+P --> M : 1
+M --> D : exit 1, error on stderr
+
+@enduml
